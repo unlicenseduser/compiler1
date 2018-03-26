@@ -1,0 +1,43 @@
+%{
+#include "Token.h"
+char *lexeme;
+int lineNumber=1;
+%}
+%x comment
+DIGIT [0-9]
+%%
+0|[1-9]{DIGIT}*	                                           	{fprintf(yyout,"\nInteger:%s at line %d",yytext,lineNumber);create_and_store_token(TOKEN_INT_NUM,yytext,lineNumber);}
+0"."{DIGIT}+|[1-9]{DIGIT}*"."{DIGIT}+   			{fprintf(yyout,"\nReal_num:%s at line %d",yytext,lineNumber);create_and_store_token(TOKEN_REAL_NUM,yytext,lineNumber);}
+"+"|"/"|"-"|"*"|"**"                                            {fprintf(yyout,"\nAn Operator:%s at line %d",yytext,lineNumber);create_and_store_token(TOKEN_AR_OP,yytext,lineNumber);}
+\n  								{lineNumber++;}
+"block"|"begin"|"end"|"type"|"is"|"integer"|"real"|"array"|"of"|"when"|"do"|"default"|"end_when"|"for"|"end_for"|"malloc"|"size_of"|"free"	{fprintf(yyout,"\nKeyword:%s at line %d",yytext,lineNumber);
+																		create_and_store_token(TOKEN_KEYWORD,yytext,lineNumber);}
+[A-Za-z]|[A-Za-z]["_"?[A-Za-z0-9]+]*				{fprintf(yyout,"\nId:%s at line %d",yytext,lineNumber);create_and_store_token(TOKEN_ID,yytext,lineNumber);}
+"="								{fprintf(yyout,"\nAssignment:%s at line %d",yytext,lineNumber);create_and_store_token(TOKEN_ASSIGNMENT,yytext,lineNumber);}
+"^"								{fprintf(yyout,"\nPointer:%s at line %d",yytext,lineNumber);create_and_store_token(TOKEN_POINTER,yytext,lineNumber);}
+"<"|">"|"!="|">="|"<="|"=="					{fprintf(yyout,"\nComparison_op:%s at line %d",yytext,lineNumber);create_and_store_token(TOKEN_COMPARISON_OP,yytext,lineNumber);}
+","|";"|":"|"["|"]"|"("|")"|"{"|"}"			{fprintf(yyout,"\nSeparation_sign:%s at line %d",yytext,lineNumber);create_and_store_token(TOKEN_SEPARATION_SIGN,yytext,lineNumber);}
+"."								{fprintf(yyout,"\nDot:%s at line %d",yytext,lineNumber);create_and_store_token(TOKEN_DOT,yytext,lineNumber);}
+"||"								{fprintf(yyout,"\nOr:%s at line %d",yytext,lineNumber);create_and_store_token(TOKEN_OR_OP,yytext,lineNumber);}
+"&"								{fprintf(yyout,"\nUnary_op:%s at line %d",yytext,lineNumber);create_and_store_token(TOKEN_UNARY_OP,yytext,lineNumber);}
+[" "]								{}
+["	"]							{}
+
+
+
+.                                                       	{fprintf(yyout,"\nUnrecognized character: %s at line %d",yytext,lineNumber);}
+"--"   BEGIN(comment);
+<comment>[^\n]                    
+<comment>\n   {ECHO;BEGIN(0);}
+.|\n   ECHO;
+
+
+%%
+void main(int argc, char* argv[])
+{
+yyin=fopen(argv[1],"r");
+if(argv[2])  yyout=fopen(argv[2],"w");
+else yyout=stdout;
+yylex();
+}
+

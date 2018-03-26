@@ -1,0 +1,36 @@
+block
+	type ptr is ^integer;
+	type int is integer;
+	type double is real;
+	type arr is array [10] of integer;
+	
+	i : int;
+	int_var1 : int;
+	int_var2 : int;	
+	double2var : double;
+	pointer_var : ptr;
+	arr_var : arr;
+begin
+	int_var1 = 10;
+	double2var = 10.2;
+	pointer_var = &int_var1;
+	int_var2 = pointer_var^;
+	arr_var = malloc(size_of(arr));	-- we now have an array.
+	arr_var[int_var1/int_var2]=int_var1+int_var2*77;
+	
+	for (i=0;i<=pointer_var^;i++)
+		arr_value[i] = 2**i;		-- 0,1,2,4,8...
+	end_for;
+	
+	i = 0;
+	when (i!=10)
+		do
+			arr_var[i] = arr_var[i] - 1;		
+		default    i++;
+	end_when;--with condition i!=10
+
+	free(arr_var);
+
+
+end  -- some symbols that are illegal for tokens, but legal 
+     -- here:  % , $ , # , @, " , | , \ , '
